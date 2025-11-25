@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+.menu-link:hover {
+    color: #E3562B;
+}
+.btn-primary {
+    background-color: #E3562B;
+    color: white;
+}
+.btn-primary:hover {
+    background-color: #d44f27;
+}
+.btn-outline-primary:hover {
+    background-color: #FFE6DC;
+}
+.btn-outline-primary {
+    background-color: white;
+    border: 2px solid #E3562B; 
+}
+.featuresOne{
+    background-image: url('../src/assets/imgs/feature-one.jpg');
+    background-size: cover;
+    background-position: center;
+}
+.featuresTwo{
+    background-image: url('../src/assets/imgs/feature-two.jpg');
+    background-size: cover;
+    background-position: center;
+}
+.featuresThree{
+    background-image: url('../src/assets/imgs/feature-three.jpg');
+    background-size: cover;
+    background-position: center;
+}
+.text-color{
+    color: #E3562B;
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(-50%);
+    }
+    100% {
+        transform: translateX(0%);
+    }
+}
+.animate-marquee {
+    display: inline-flex;
+    animation: marquee 15s linear infinite;
+}
