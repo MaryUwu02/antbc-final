@@ -4,7 +4,7 @@
 
         <main class="flex-1 p-6">
             <div class="flex items-center justify-between gap-4 mb-6">
-                <h2>Tus chats grupales</h2>
+                    <h1 class="text-2xl font-bold text-gray-800 mb-2">Mis chats grupales</h1>
                 <Search />
             </div>
         </main>

@@ -21,10 +21,8 @@ async function loadTasks() {
       .eq('member_id', props.memberId)
 
     if (error) throw error
-    // proteger contra null
     tasks.value = (data || []).map(t => ({
       ...t,
-      // garantiza booleano
       completed: t.completed === true,
     }))
   } catch (err) {
@@ -36,9 +34,7 @@ async function loadTasks() {
 }
 
 async function toggleTask(task) {
-  // estado previo para revertir si falla
   const prev = !!task.completed
-  // invertimos localmente para respuesta rápida en UI
   task.completed = !prev
 
   try {
@@ -48,7 +44,6 @@ async function toggleTask(task) {
       .eq('id', task.id)
 
     if (error) {
-      // revertir si hay error
       task.completed = prev
       console.error('Error actualizando tarea:', error)
       errorMsg.value = 'No se pudo actualizar la tarea.'

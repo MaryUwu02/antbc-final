@@ -23,9 +23,6 @@ const routes = [
 
   { path: '/group/:id', name: 'MyGroup', component: () => import('../pages/appweb/MyGroup.vue'), props: true },
 
-  { path: '/app/seguimiento', name: 'Seguimiento', component: Seguimiento },
-  { path: '/member/:id', name: 'MemberDetailPage', component: MemberDetailPage, props: true },
-  
 ]
 
 const router = createRouter({

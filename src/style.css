@@ -35,7 +35,16 @@
 .text-color{
     color: #E3562B;
 }
-
+.img-fondo{
+    background-image: url('../src/assets/imgs/fondo-form.jpg');
+    background-size: cover;
+}
+.login-img{
+    background-image: url('../src/assets/imgs/login.jpg');
+}
+.img-register{
+    background-image: url('../src/assets/imgs/register.jpg');
+}
 @keyframes marquee {
     0% {
         transform: translateX(-50%);

@@ -1,5 +1,5 @@
 <template>
-  <section class="min-h-screen flex items-center justify-center bg-gray-50 p-6">
+  <section class="img-fondo min-h-screen flex items-center justify-center">
     <div class="bg-white rounded-2xl shadow p-6 w-full max-w-md">
       <h2 class="text-xl font-semibold text-gray-900 mb-6 text-center">Crear nuevo grupo</h2>
 
@@ -37,15 +37,16 @@
         </div>
 
         <div class="flex justify-end gap-3 mt-4">
-          <button
+          <router-link
+            to="/home"
             type="button"
             class="px-6 py-2 rounded-2xl bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition"
           >
             Cancelar
-          </button>
+          </router-link>
           <button
             type="submit"
-            class="px-6 py-2 rounded-2xl bg-green-900 text-white font-semibold shadow hover:bg-green-800 transition"
+            class="px-6 py-2 rounded-2xl btn-primary text-white font-semibold shadow transition"
           >
             Crear grupo
           </button>

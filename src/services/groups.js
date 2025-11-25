@@ -65,75 +65,11 @@ export async function deleteGroup(groupId) {
   return true;
 }
 
-export async function archiveGroup(groupId) {
-  const { data, error } = await supabase
-    .from('groups')
-    .update({
-      archived: true,
-      archived_at: new Date(),
-    })
-    .eq('group_id', groupId)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
-}
-
-export async function restoreGroup(groupId) {
-  const { data, error } = await supabase
-    .from('groups')
-    .update({
-      archived: false,
-      archived_at: null,
-    })
-    .eq('group_id', groupId)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return data;
-}
-
 export async function fetchGroupById(groupId) {
   const { data, error } = await supabase
     .from('groups')
     .select('*')
     .eq('group_id', groupId)
-    .single();
-
-  if (error) throw error;
-  return data;
-}
-
-export async function moveToTrash(groupId) {
-  const { data, error } = await supabase
-    .from('groups')
-    .update({
-      trashed: true,
-      trashed_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    })
-    .eq('group_id', groupId)
-    .select()
-    .single();
-
-  if (error) throw error;
-  return {
-    ...data,
-    id: data.group_id,
-  };
-}
-
-export async function restoreFromTrash(groupId) {
-  const { data, error } = await supabase
-    .from('groups')
-    .update({
-      trashed: false,
-      trashed_at: null,
-    })
-    .eq('group_id', groupId)
-    .select()
     .single();
 
   if (error) throw error;

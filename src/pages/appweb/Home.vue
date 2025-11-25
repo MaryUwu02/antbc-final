@@ -8,7 +8,7 @@
         <div class="flex flex-col md:flex-row items-center justify-between gap-4">
           <Welcome />
           <div class="flex items-center gap-1">
-            <Search />
+              <Search v-model="search" />
             <CreateGroupBtn />
           </div>
         </div>
@@ -18,7 +18,7 @@
         </div>
 
         <div class="mt-6">
-          <Group @view-group="showGroupDetail" />
+          <Group :search="search" @view-group="showGroupDetail" />
         </div>
       </template>
 
@@ -43,6 +43,7 @@
 </template>
 
 <script setup>
+
 import { ref } from 'vue'
 import NavMobile from '../../components/mobile/NavMobile.vue'
 import Search from '../../components/mobile/Search.vue'
@@ -57,6 +58,7 @@ import MemberDetail from '../../components/mobile/MemberDetailPage.vue'
 const selectedGroupId = ref(null)
 const showSeguimiento = ref(false)
 const selectedMemberId = ref(null)
+const search = ref("")
 
 function showGroupDetail(group) {
   selectedGroupId.value = group.id

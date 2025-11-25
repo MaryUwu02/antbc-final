@@ -2,9 +2,17 @@
   <div>
     <h2 class="text-xl font-semibold text-gray-900 mb-4">Mis grupos</h2>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div v-if="loading" class="flex items-center justify-center py-20">
+      <Loader />
+    </div>
+
+    <div v-else-if="groups.length === 0"class="text-gray-500 text-sm italic">
+      Todavía no creaste grupos.
+    </div>
+
+    <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <div
-        v-for="group in groups"
+        v-for="group in filteredGroups"
         :key="group.id || group.group_id"
         class="bg-white rounded-2xl shadow p-5 flex flex-col gap-3 border border-gray-100 relative"
       >
@@ -88,129 +96,110 @@
       @confirm="confirmDelete"
       @cancel="closeDeleteModal"
     >
-      ¿Estás seguro de que quieres eliminar el proyecto
+      ¿Estás seguro de que querés eliminar el grupo
       <span class="font-medium text-gray-800">"{{ deleteTarget?.name }}"</span>?
-      Esta acción no se puede deshacer.
+      Podés restaurarlo cuando quieras en la pestaña
+      <span class="font-medium text-gray-800">papelera.</span>
     </DeleteModal>
   </div>
 </template>
 
 <script>
-import { fetchGroups, updateGroup, deleteGroup as svcDeleteGroup, archiveGroup } from "../../services/groups.js";
+import Loader from "../Loader.vue";
+import { fetchGroups, deleteGroup as deleteGroupService } from "../../services/groups.js";
 import DeleteModal from "../DeleteModal.vue";
 
 export default {
-  components: { DeleteModal },
-
+  components: { Loader, DeleteModal },
+  props: {
+    search:
+    { type: String,
+      default: ""
+    }
+  },
   data() {
     return {
       groups: [],
       form: { name: '', startDate: '', due_date: '' },
       creating: false,
       createError: null,
-      ownerId: '00000000-0000-0000-0000-000000000001',
       openMenuId: null,
-
       showDeleteModal: false,
       deleteTarget: null,
       deleteTargetId: null,
       actionLoading: {},
+      loading: true,
     };
   },
-
   methods: {
     async loadGroups() {
+      this.loading = true;
       try {
         const loaded = await fetchGroups();
         this.groups = Array.isArray(loaded) ? loaded : [];
       } catch (err) {
         console.error('Error cargando grupos:', err);
+        this.groups = [];
+      } finally {
+        this.loading = false;
       }
     },
-
     toggleMenu(id) { this.openMenuId = this.openMenuId === id ? null : id; },
     closeMenu() { this.openMenuId = null; },
-
     handleClickOutside(event) {
       const wrapper = this.$refs.menuWrapper;
       if (!wrapper) return;
       if (!Array.isArray(wrapper)) {
         if (!wrapper.contains(event.target)) this.closeMenu();
       } else {
-        const clickedInside = wrapper.some((el) => el && el.contains(event.target));
+        const clickedInside = wrapper.some(el => el && el.contains(event.target));
         if (!clickedInside) this.closeMenu();
       }
     },
-
     formatDate(value) {
       try { if (!value) return '-'; return new Date(value).toLocaleDateString(); }
       catch { return String(value); }
     },
-
     openDeleteModal(group) {
       this.deleteTarget = group;
       this.deleteTargetId = group.id || group.group_id;
       this.showDeleteModal = true;
       this.closeMenu();
     },
-
     closeDeleteModal() {
       if (this.deleteTargetId && this.actionLoading[this.deleteTargetId]) return;
       this.showDeleteModal = false;
       this.deleteTarget = null;
       this.deleteTargetId = null;
     },
-
     async confirmDelete() {
       const id = this.deleteTargetId;
       if (!id) return;
       if (this.actionLoading[id]) return;
-
       const target = this.deleteTarget;
-
       this.showDeleteModal = false;
       this.deleteTarget = null;
       this.deleteTargetId = null;
-
-      this.actionLoading[id] = true;
-
+      this.$set ? this.$set(this.actionLoading, id, true) : (this.actionLoading[id] = true);
       try {
-        await svcDeleteGroup(target.group_id || target.id);
-
+        await deleteGroupService(target.group_id || target.id);
         this.groups = this.groups.filter(g => (g.id || g.group_id) !== id);
-
       } catch (err) {
         console.error('Error eliminando grupo:', err);
       } finally {
-        this.actionLoading[id] = false;
+        this.$set ? this.$set(this.actionLoading, id, false) : (this.actionLoading[id] = false);
       }
     },
-
     editGroup(group) {
       const id = group.group_id || group.id;
-      if (!id) {
-        console.error('No se encontró id del grupo para editar.');
-        this.closeMenu();
-        return;
-      }
+      if (!id) { console.error('No se encontró el id del grupo para editar.'); this.closeMenu(); return; }
       this.$router.push({ name: 'group-edit', params: { id } });
       this.closeMenu();
     },
-
-    async archiveGroup(group) {
-      try {
-        const updated = await archiveGroup(group.group_id || group.id);
-        this.groups = this.groups.map(g => ((g.group_id || g.id) === (updated.group_id || updated.id) ? { ...g, ...updated } : g));
-      } catch (err) {
-        console.error('Error archivar/restaurar:', err);
-      } finally {
-        this.closeMenu();
-      }
-    },
   },
 
-  mounted() {
-    this.loadGroups();
+  async mounted() {
+    await this.loadGroups();
     document.addEventListener('click', this.handleClickOutside);
     this._onKeydown = (e) => {
       if (e.key === 'Escape') {
@@ -221,27 +210,19 @@ export default {
     window.addEventListener('keydown', this._onKeydown);
   },
 
+  computed: {
+    filteredGroups() {
+      const q = (this.search || "").toLowerCase().trim();
+      if (q.length < 2) return this.groups;
+      const slice3 = q.slice(0, 2);
+      return this.groups.filter(g =>
+        (g.name || "").toLowerCase().startsWith(slice3)
+      );
+    }
+  },
   beforeUnmount() {
     document.removeEventListener('click', this.handleClickOutside);
     if (this._onKeydown) window.removeEventListener('keydown', this._onKeydown);
   },
 };
 </script>
-
-<style scoped>
-.fade-scale-enter-active,
-.fade-scale-leave-active {
-  transition: transform 120ms ease, opacity 120ms ease;
-}
-.fade-scale-enter-from,
-.fade-scale-leave-to {
-  transform: scale(0.95);
-  opacity: 0;
-}
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 150ms ease;
-}
-.fade-enter-from, .fade-leave-to {
-  opacity: 0;
-}
-</style>

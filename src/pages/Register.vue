@@ -39,8 +39,7 @@ async function handleSubmit() {
     aria-hidden="true"
     >
         <div
-        class="w-full h-64 md:h-full flex items-center justify-center shadow-lg md:rounded-none rounded-b-2xl md:rounded-r-2xl overflow-hidden"
-        style="background-color: #0A88C4;"
+        class="img-register w-full h-64 md:h-full flex items-center justify-center shadow-lg md:rounded-none rounded-b-2xl md:rounded-r-2xl overflow-hidden"
         >
         </div>
     </aside>
