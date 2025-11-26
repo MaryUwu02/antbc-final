@@ -7,10 +7,12 @@
         </button>
 
         <button
-        class="px-6 py-2 rounded-full font-semibold text-white bg-green-600 hover:bg-green-700 transition"
+        class="px-6 py-2 rounded-full font-semibold text-white bg-green-600"
+        @click="$router.push('/new-file')"
         >
         Crear archivo
         </button>
+
 
     </div>
 </template>

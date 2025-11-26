@@ -29,9 +29,6 @@ export default {
     return {
       archivos: [
         { nombre: "Archivo 1", ultimaEdicion: "24/11/2025", ruta: "/ruta-destino" },
-        { nombre: "Archivo 2", ultimaEdicion: "23/11/2025", ruta: "/ruta-destino" },
-        { nombre: "Archivo 3", ultimaEdicion: "22/11/2025", ruta: "/ruta-destino" },
-        { nombre: "Archivo 4", ultimaEdicion: "21/11/2025", ruta: "/ruta-destino" },
       ],
     };
   },

@@ -77,11 +77,12 @@ async function handleSubmit() {
           </div>
 
           <div>
-            <button type="submit"
+            <router-link
+              to="/home"
               class="btn-primary w-full inline-flex items-center justify-center px-5 py-3 rounded-2xl text-white font-semibold shadow hover:bg-green-800 transition"
               >
               Iniciar sesión
-            </button>
+            </router-link>
           </div>
         </form>
 
