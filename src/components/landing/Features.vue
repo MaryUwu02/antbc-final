@@ -7,45 +7,54 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 
-                <div
-                class="featuresOne relative flex flex-col justify-end rounded-3xl shadow-md text-center overflow-hidden h-120"
-                >
-                    <div class="relative z-10 p-6 text-white">
-                        <h3 class="text-2xl font-semibold mb-3">
-                        Crea un grupo de trabajo e invita a tu equipo
-                        </h3>
-                        <p class="text-sm sm:text-base">
-                        Organizá tus proyectos en grupos colaborativos. Invitá a integrantes o visitantes mediante
-                        un enlace seguro y gestioná permisos fácilmente desde una misma plataforma.
-                        </p>
+                <div class="featuresOne relative rounded-3xl shadow-md text-center overflow-hidden h-120 flex flex-col">
+                    <div class="relative z-10 p-6 text-white flex flex-col h-full">
+
+                        <div class="mt-auto">
+                            <h3 class="text-2xl font-semibold mb-3 min-h-16">
+                                Crea un grupo de trabajo e invita a tu equipo
+                            </h3>
+
+                            <p class="text-sm sm:text-base min-h-28">
+                                Organizá tus proyectos en grupos colaborativos. Invitá a integrantes o visitantes mediante
+                                un enlace seguro y gestioná permisos fácilmente desde una misma plataforma.
+                            </p>
+                        </div>
+
                     </div>
                 </div>
 
-                <div
-                class="featuresTwo relative flex flex-col justify-end rounded-3xl shadow-md text-center overflow-hidden h-120"
-                >
-                    <div class="relative z-10 p-6 text-white">
-                        <h3 class="text-2xl font-semibold mb-3">
-                        Realizá llamadas y videollamadas con tu equipo
-                        </h3>
-                        <p class="text-sm sm:text-base">
-                        Conectate en tiempo real con tu grupo sin depender de múltiples aplicaciones.
-                        AntBC integra videollamadas y reuniones virtuales de forma fluida y segura.
-                        </p>
+                <div class="featuresTwo relative rounded-3xl shadow-md text-center overflow-hidden h-120 flex flex-col">
+                    <div class="relative z-10 p-6 text-white flex flex-col h-full">
+
+                        <div class="mt-auto">
+                            <h3 class="text-2xl font-semibold mb-3 min-h-16">
+                                Realizá llamadas con tu equipo
+                            </h3>
+
+                            <p class="text-sm sm:text-base min-h-28">
+                                Conectate en tiempo real con tu grupo sin depender de múltiples aplicaciones.
+                                AntBC integra videollamadas y reuniones virtuales de forma fluida y segura.
+                            </p>
+                        </div>
+
                     </div>
                 </div>
 
-                <div
-                class="featuresThree relative flex flex-col justify-end rounded-3xl shadow-md text-center overflow-hidden h-120"
-                >
-                    <div class="relative z-10 p-6 text-white">
-                        <h3 class="text-2xl font-semibold mb-3">
-                        Chateá con tu equipo y usá el ChatBot
-                        </h3>
-                        <p class="text-sm sm:text-base">
-                        Comunicá ideas, compartí archivos y pedile al asistente integrado que te ayude
-                        con tareas, redacción o brainstorming sin salir de AntBC.
-                        </p>
+                <div class="featuresThree relative rounded-3xl shadow-md text-center overflow-hidden h-120 flex flex-col">
+                    <div class="relative z-10 p-6 text-white flex flex-col h-full">
+
+                        <div class="mt-auto">
+                            <h3 class="text-2xl font-semibold mb-3 min-h-16">
+                                Chateá con tu equipo y usá el ChatBot
+                            </h3>
+
+                            <p class="text-sm sm:text-base min-h-28">
+                                Comunicá ideas, compartí archivos y pedile al asistente integrado que te ayude
+                                con tareas, redacción o brainstorming sin salir de AntBC.
+                            </p>
+                        </div>
+
                     </div>
                 </div>
 

@@ -44,7 +44,10 @@ export async function login(email, password) {
 
 export async function logout() {
     await supabase.auth.signOut()
-    user = { id: null, email: null }
+    user = {
+        id: null,
+        email: null
+    }
     notifyAll()
 }
 

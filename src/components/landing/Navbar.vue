@@ -1,6 +1,15 @@
 <template>
     <nav class="flex items-center justify-between p-4 bg-white shadow-sm relative" aria-label="Barra de navegación">
-        <h1 class="text-xl font-bold">AntBC</h1>
+
+        <div>
+            <img 
+                src="../../assets/imgs/logo-2-negro.png" 
+                alt="AntBC logo" 
+                class="w-20 h-20 object-contain"
+            />
+        </div>
+
+        <h1 class="text-xl font-bold invisible">AntBC</h1>
 
         <button
             @click="isOpen = !isOpen"

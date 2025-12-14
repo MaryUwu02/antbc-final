@@ -39,23 +39,29 @@
         </div>
     </section>
 
-    <div class="overflow-hidden whitespace-nowrap relative bg-white py-4">
-        <div class="animate-marquee flex gap-12 text-xl font-semibold text-gray-800">
-            <span>Calendario</span>
-            <span>ChatBot</span>
-            <span>Tablero</span>
-            <span>Seguimiento</span>
-            <span>Recordatorios</span>
-            <span>Diagramas</span>
-            <span>Métricas</span>
-            <span>Videollamada</span>
-            <span>To Do List</span>
-            <span>Notas</span>
-            <span>Presentación</span>
-            <span>Diseño</span>
-            <span>Organización</span>
-        </div>
-    </div>
+    <div class="overflow-hidden whitespace-nowrap relative bg-white py-6">
+
+  <div class="flex gap-6 text-lg sm:text-xl font-semibold 
+              animate-[marquee_18s_linear_infinite]">
+
+    <template v-for="i in 2">
+      <span class="px-5 py-2 rounded-xl bg-[#F79C05] text-[#332926]">Calendarios</span>
+      <span class="px-5 py-2 rounded-xl bg-[#F79C05] text-[#332926]">ChatBots</span>
+      <span class="px-5 py-2 rounded-xl bg-[#F79C05] text-[#332926]">Tableros</span>
+      <span class="px-5 py-2 rounded-xl bg-[#F79C05] text-[#332926]">Seguimientos</span>
+      <span class="px-5 py-2 rounded-xl bg-[#F79C05] text-[#332926]">Recordatorios</span>
+      <span class="px-5 py-2 rounded-xl bg-[#F79C05] text-[#332926]">Diagramas</span>
+      <span class="px-5 py-2 rounded-xl bg-[#F79C05] text-[#332926]">Métricas</span>
+      <span class="px-5 py-2 rounded-xl bg-[#F79C05] text-[#332926]">Llamadas</span>
+      <span class="px-5 py-2 rounded-xl bg-[#F79C05] text-[#332926]">Lista de Tareas</span>
+      <span class="px-5 py-2 rounded-xl bg-[#F79C05] text-[#332926]">Notas</span>
+      <span class="px-5 py-2 rounded-xl bg-[#F79C05] text-[#332926]">Presentaciones</span>
+      <span class="px-5 py-2 rounded-xl bg-[#F79C05] text-[#332926]">Diseños</span>
+      <span class="px-5 py-2 rounded-xl bg-[#F79C05] text-[#332926]">Organizaciones</span>
+    </template>
+
+  </div>
+</div>
 
 </template>
 

@@ -7,6 +7,7 @@
                     <h1 class="text-2xl font-bold text-gray-800 mb-2">Mis chats grupales</h1>
                 <Search />
             </div>
+            <p class="text-gray-500 text-sm italic">Todavía no hay chats disponibles</p>
         </main>
     </div>
 </template>

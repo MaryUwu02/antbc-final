@@ -1,9 +1,9 @@
 <template>
-    <div class="flex gap-4 mb-6">
+    <div class="flex gap-4">
         <button
         class="px-6 py-2 rounded-full font-semibold text-white bg-yellow-500 hover:bg-yellow-600 transition"
         >
-        Compartir
+        Invitar
         </button>
 
         <button
@@ -12,8 +12,6 @@
         >
         Crear archivo
         </button>
-
-
     </div>
 </template>
 

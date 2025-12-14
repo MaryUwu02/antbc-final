@@ -1,31 +1,85 @@
+<script setup lang="ts">
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { login } from "../services/auth";
 
-<script setup  lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { login } from '../services/auth';
-
-const router = useRouter()
+const router = useRouter();
 
 const loading = ref(false);
+
 const user = ref({
-    email: '',
-    password: '',
+  email: "",
+  password: "",
 });
 
+const errors = ref({
+  email: "",
+  password: "",
+  general: "",
+});
+
+
+function validate() {
+  errors.value.email = "";
+  errors.value.password = "";
+  errors.value.general = "";
+
+  let valid = true;
+
+  if (!user.value.email) {
+    errors.value.email = "El email es obligatorio.";
+    valid = false;
+  } else if (!user.value.email.includes("@")) {
+    errors.value.email = "Ingresá un email válido.";
+    valid = false;
+  }
+
+  if (!user.value.password) {
+    errors.value.password = "La contraseña es obligatoria.";
+    valid = false;
+  } else if (user.value.password.length < 6) {
+    errors.value.password = "La contraseña debe tener al menos 6 caracteres.";
+    valid = false;
+  }
+
+  return valid;
+}
+
+
 async function handleSubmit() {
-    try {
-      loading.value = true;
+  errors.value.general = "";
 
-      await login(user.value.email, user.value.password);
+  if (!validate()) return;
 
-      router.push('/home');
-      } catch (error: any) {
-        console.log('Error al iniciar sesión: ' + error.message)
-      }
+  loading.value = true;
 
+  try {
+    const res = await login(user.value.email, user.value.password);
+    if (res && (res.error || (!res.user && !res.data?.user))) {
+      errors.value.general = "Email o contraseña incorrecta.";
+      return;
+    }
+
+    router.push("/home");
+  } catch (err: any) {
+    const msg = (err && (err.message || err.error)) || "";
+    if (
+      msg.toString().toLowerCase().includes("invalid") ||
+      msg.toString().toLowerCase().includes("credentials") ||
+      msg.toString().toLowerCase().includes("user not found") ||
+      msg.toString().toLowerCase().includes("email")
+    ) {
+      errors.value.general = "Email o contraseña incorrecta.";
+    } else {
+      errors.value.general = "No se pudo iniciar sesión. Intentá nuevamente.";
+      console.error("Error al iniciar sesión:", err);
+    }
+  } finally {
     loading.value = false;
+  }
 }
 </script>
+
 <template>
 <section class="min-h-screen grid grid-cols-1 md:grid-cols-2">
     <aside
@@ -63,6 +117,7 @@ async function handleSubmit() {
               class="mt-1 block w-full rounded-lg border border-gray-200 shadow-sm p-3 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-300"
               v-model="user.email"
             />
+            <p v-if="errors.email" class="text-red-600 text-sm mt-1">{{ errors.email }}</p>
           </div>
 
           <div>
@@ -74,15 +129,21 @@ async function handleSubmit() {
               class="mt-1 block w-full rounded-lg border border-gray-200 shadow-sm p-3 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-300"
               v-model="user.password"
             />
+            <p v-if="errors.password" class="text-red-600 text-sm mt-1">{{ errors.password }}</p>
+            <p v-if="errors.general" class="text-red-600 text-sm mt-1">
+              {{ errors.general }}
+            </p>
           </div>
 
           <div>
-            <router-link
-              to="/home"
-              class="btn-primary w-full inline-flex items-center justify-center px-5 py-3 rounded-2xl text-white font-semibold shadow hover:bg-green-800 transition"
-              >
-              Iniciar sesión
-            </router-link>
+            <button
+              type="submit"
+              :disabled="loading"
+              class="btn-primary w-full inline-flex items-center justify-center px-5 py-3 rounded-2xl text-white font-semibold shadow hover:bg-green-800 transition disabled:opacity-50"
+            >
+              <span v-if="!loading">Iniciar sesión</span>
+              <span v-else>Ingresando...</span>
+            </button>
           </div>
         </form>
 
@@ -90,13 +151,12 @@ async function handleSubmit() {
             ¿No recordás tus datos?
           <a class="text-green-700 underline ml-1"
           >
-            Tocá acá
-          </a>
-        </p>
-        <router-link
-        to="/register" class="mt-4 text-sm text-center text-gray-600">
+          <router-link
+        to="/register" class="mt-4 text-sm text-center">
           Registrarse
         </router-link>
+          </a>
+        </p>
       </div>
     </main>
   </section>

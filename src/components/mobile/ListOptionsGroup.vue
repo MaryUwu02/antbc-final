@@ -1,15 +1,34 @@
 <template>
-    <div class=" bg-white shadow rounded-xl p-4 w-56">
-        <h1 class="text-2xl font-bold mb-4">Mis archivos</h1>
-        <ul>
-            <li class="flex flex-col gap-2 text-lg font-medium">
-                <a class="cursor-pointer px-3 py-2 rounded-lg">Todos</a>
-                <a class="cursor-pointer px-3 py-2 rounded-lg">Favoritos</a>
-                <a class="cursor-pointer px-3 py-2 rounded-lg">Seguimiento</a>
-                <a class="cursor-pointer px-3 py-2 rounded-lg">Archivado</a>
-                <a class="cursor-pointer px-3 py-2 rounded-lg">Papelera</a>
-            </li>
-        </ul>
+    <div class="flex gap-4">
+        <button
+        class="px-6 py-2 rounded-full font-semibold text-gray-800 bg-gray-200 hover:bg-gray-300 transition"
+        >
+            Todos
+        </button>
+
+        <button
+        class="px-6 py-2 rounded-full font-semibold text-gray-800 bg-gray-200 hover:bg-gray-300 transition"
+        >
+            Favoritos
+        </button>
+
+        <button
+        class="px-6 py-2 rounded-full font-semibold text-gray-800 bg-gray-200 hover:bg-gray-300 transition"
+        >
+            Seguimiento
+        </button>
+
+        <button
+        class="px-6 py-2 rounded-full font-semibold text-gray-800 bg-gray-200 hover:bg-gray-300 transition"
+        >
+            Archivado
+        </button>
+
+        <button
+        class="px-6 py-2 rounded-full font-semibold text-gray-800 bg-gray-200 hover:bg-gray-300 transition"
+        >
+            Papelera
+        </button>
     </div>
 </template>
 

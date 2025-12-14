@@ -2,25 +2,26 @@
     <div class="flex min-h-screen">
         <NavMobile />
         <main class="flex-1 p-6">
-            <div class="flex items-center justify-between gap-4 mb-6">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-6">
                 <WelcomeGroup />
                 <Search />
             </div>
-            <div class="flex justify-end mb-6">
+
+            <div class="flex flex-col items-end mb-6 gap-4">
                 <ButtonsGroup />
-            </div>
-            <div class="flex flex-col md:flex-row gap-6">
-                <div class="flex">
+                <div class="w-full md:w-auto">
                     <ListOptionsGroup />
                 </div>
-                <div class="flex-1">
+            </div>
+
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="flex-1 ">
                     <CardFile />
                 </div>
             </div>
         </main>
     </div>
 </template>
-
 
 <script setup>
 import NavMobile from '../../components/mobile/NavMobile.vue';

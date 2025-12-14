@@ -45,6 +45,7 @@
 .img-register{
     background-image: url('../src/assets/imgs/register.jpg');
 }
+
 @keyframes marquee {
     0% {
         transform: translateX(-50%);

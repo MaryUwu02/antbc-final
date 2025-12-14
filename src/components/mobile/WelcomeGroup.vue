@@ -1,4 +1,4 @@
-    <template>
+<template>
     <section class="flex items-center gap-3 w-full md:w-auto">
         <div>
             <h1 class="font-bold text-gray-900 text-3xl">

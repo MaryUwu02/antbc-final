@@ -1,12 +1,12 @@
 <template>
   <div>
-    <h2 class="text-xl font-semibold text-gray-900 mb-4">Mis grupos</h2>
+    <h3 class="text-xl font-semibold text-gray-900 mb-4">Mis grupos</h3>
 
     <div v-if="loading" class="flex items-center justify-center py-20">
       <Loader />
     </div>
 
-    <div v-else-if="groups.length === 0"class="text-gray-500 text-sm italic">
+    <div v-else-if="groups.length === 0" class="text-gray-500 text-sm italic">
       Todavía no creaste grupos.
     </div>
 
@@ -17,7 +17,9 @@
         class="bg-white rounded-2xl shadow p-5 flex flex-col gap-3 border border-gray-100 relative"
       >
         <div class="flex justify-between items-start">
-          <h3 class="text-lg font-semibold text-gray-900">{{ group.name }}</h3>
+          <h4 class="text-lg font-semibold text-gray-900">
+            {{ group.name }}
+          </h4>
 
           <div class="relative" ref="menuWrapper">
             <i
@@ -29,8 +31,6 @@
               <div
                 v-if="openMenuId === (group.id || group.group_id)"
                 class="absolute right-0 mt-2 w-44 bg-white border border-gray-100 rounded-lg shadow-lg z-50"
-                role="menu"
-                aria-orientation="vertical"
               >
                 <ul class="py-1 text-sm text-gray-700">
                   <li>
@@ -41,6 +41,7 @@
                       Editar proyecto
                     </button>
                   </li>
+
                   <li>
                     <button
                       class="block w-full text-left px-4 py-2 hover:bg-gray-100"
@@ -49,6 +50,7 @@
                       Archivar proyecto
                     </button>
                   </li>
+
                   <li>
                     <button
                       class="block w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
@@ -76,7 +78,10 @@
           <div class="w-full bg-gray-200 rounded-full h-2">
             <div
               class="h-2 rounded-full"
-              :style="{ width: (group.progress || 0) + '%', backgroundColor: '#0A88C4' }"
+              :style="{
+                width: (group.progress || 0) + '%',
+                backgroundColor: '#0A88C4'
+              }"
             ></div>
           </div>
         </div>
@@ -97,40 +102,72 @@
       @cancel="closeDeleteModal"
     >
       ¿Estás seguro de que querés eliminar el grupo
-      <span class="font-medium text-gray-800">"{{ deleteTarget?.name }}"</span>?
+      <span class="font-medium text-gray-800">
+        "{{ deleteTarget?.name }}"
+      </span>?
       Podés restaurarlo cuando quieras en la pestaña
       <span class="font-medium text-gray-800">papelera.</span>
     </DeleteModal>
+
+    <EditGroupModal
+      v-if="showEditModal"
+      :group-id="editGroupId"
+      @close="closeEditModal"
+      @updated="onGroupUpdated"
+    />
   </div>
 </template>
 
 <script>
 import Loader from "../Loader.vue";
-import { fetchGroups, deleteGroup as deleteGroupService } from "../../services/groups.js";
 import DeleteModal from "../DeleteModal.vue";
+import EditGroupModal from "../EditGroupModal.vue";
+
+import {
+  fetchGroups,
+  deleteGroup as deleteGroupService,
+  archiveGroup as archiveGroupService,
+} from "../../services/groups.js";
 
 export default {
-  components: { Loader, DeleteModal },
-  props: {
-    search:
-    { type: String,
-      default: ""
-    }
+  components: {
+    Loader,
+    DeleteModal,
+    EditGroupModal,
   },
+
+  props: {
+    search: { type: String, default: "" },
+  },
+
   data() {
     return {
       groups: [],
-      form: { name: '', startDate: '', due_date: '' },
-      creating: false,
-      createError: null,
       openMenuId: null,
+
+      showEditModal: false,
+      editGroupId: null,
+
       showDeleteModal: false,
       deleteTarget: null,
       deleteTargetId: null,
+
       actionLoading: {},
       loading: true,
     };
   },
+
+  computed: {
+    filteredGroups() {
+      const q = (this.search || "").toLowerCase().trim();
+      if (q.length < 2) return this.groups;
+      const slice = q.slice(0, 2);
+      return this.groups.filter((g) =>
+        (g.name || "").toLowerCase().startsWith(slice)
+      );
+    },
+  },
+
   methods: {
     async loadGroups() {
       this.loading = true;
@@ -138,91 +175,135 @@ export default {
         const loaded = await fetchGroups();
         this.groups = Array.isArray(loaded) ? loaded : [];
       } catch (err) {
-        console.error('Error cargando grupos:', err);
+        console.error("Error cargando grupos:", err);
         this.groups = [];
       } finally {
         this.loading = false;
       }
     },
-    toggleMenu(id) { this.openMenuId = this.openMenuId === id ? null : id; },
-    closeMenu() { this.openMenuId = null; },
+
+    toggleMenu(id) {
+      this.openMenuId = this.openMenuId === id ? null : id;
+    },
+
+    closeMenu() {
+      this.openMenuId = null;
+    },
+
     handleClickOutside(event) {
       const wrapper = this.$refs.menuWrapper;
       if (!wrapper) return;
+
       if (!Array.isArray(wrapper)) {
         if (!wrapper.contains(event.target)) this.closeMenu();
       } else {
-        const clickedInside = wrapper.some(el => el && el.contains(event.target));
+        const clickedInside = wrapper.some(
+          (el) => el && el.contains(event.target)
+        );
         if (!clickedInside) this.closeMenu();
       }
     },
+
     formatDate(value) {
-      try { if (!value) return '-'; return new Date(value).toLocaleDateString(); }
-      catch { return String(value); }
+      try {
+        return value ? new Date(value).toLocaleDateString() : "-";
+      } catch {
+        return String(value);
+      }
     },
+
+    editGroup(group) {
+      const id = group.id || group.group_id;
+      if (!id) return;
+
+      this.editGroupId = id;
+      this.showEditModal = true;
+      this.closeMenu();
+    },
+
+    async archiveGroup(group) {
+      const id = group.id || group.group_id;
+      try {
+        await archiveGroupService(id);
+        this.groups = this.groups.filter(
+          (g) => (g.id || g.group_id) !== id
+        );
+      } catch (err) {
+        console.error("Error archivando grupo:", err);
+      } finally {
+        this.closeMenu();
+      }
+    },
+
     openDeleteModal(group) {
       this.deleteTarget = group;
       this.deleteTargetId = group.id || group.group_id;
       this.showDeleteModal = true;
       this.closeMenu();
     },
+
     closeDeleteModal() {
-      if (this.deleteTargetId && this.actionLoading[this.deleteTargetId]) return;
+      if (this.actionLoading[this.deleteTargetId]) return;
       this.showDeleteModal = false;
       this.deleteTarget = null;
       this.deleteTargetId = null;
     },
+
     async confirmDelete() {
       const id = this.deleteTargetId;
-      if (!id) return;
-      if (this.actionLoading[id]) return;
+      if (!id || this.actionLoading[id]) return;
+
       const target = this.deleteTarget;
-      this.showDeleteModal = false;
-      this.deleteTarget = null;
-      this.deleteTargetId = null;
-      this.$set ? this.$set(this.actionLoading, id, true) : (this.actionLoading[id] = true);
+      this.closeDeleteModal();
+
+      this.$set
+        ? this.$set(this.actionLoading, id, true)
+        : (this.actionLoading[id] = true);
+
       try {
-        await deleteGroupService(target.group_id || target.id);
-        this.groups = this.groups.filter(g => (g.id || g.group_id) !== id);
+        await deleteGroupService(target.id || target.group_id);
+        this.groups = this.groups.filter(
+          (g) => (g.id || g.group_id) !== id
+        );
       } catch (err) {
-        console.error('Error eliminando grupo:', err);
+        console.error("Error eliminando grupo:", err);
       } finally {
-        this.$set ? this.$set(this.actionLoading, id, false) : (this.actionLoading[id] = false);
+        this.$set
+          ? this.$set(this.actionLoading, id, false)
+          : (this.actionLoading[id] = false);
       }
     },
-    editGroup(group) {
-      const id = group.group_id || group.id;
-      if (!id) { console.error('No se encontró el id del grupo para editar.'); this.closeMenu(); return; }
-      this.$router.push({ name: 'group-edit', params: { id } });
-      this.closeMenu();
+
+    closeEditModal() {
+      this.showEditModal = false;
+      this.editGroupId = null;
+    },
+
+    async onGroupUpdated() {
+      await this.loadGroups();
+      this.closeEditModal();
     },
   },
 
   async mounted() {
     await this.loadGroups();
-    document.addEventListener('click', this.handleClickOutside);
+
+    document.addEventListener("click", this.handleClickOutside);
+
     this._onKeydown = (e) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         if (this.showDeleteModal) this.closeDeleteModal();
+        else if (this.showEditModal) this.closeEditModal();
         else this.closeMenu();
       }
     };
-    window.addEventListener('keydown', this._onKeydown);
+
+    window.addEventListener("keydown", this._onKeydown);
   },
 
-  computed: {
-    filteredGroups() {
-      const q = (this.search || "").toLowerCase().trim();
-      if (q.length < 2) return this.groups;
-      const slice3 = q.slice(0, 2);
-      return this.groups.filter(g =>
-        (g.name || "").toLowerCase().startsWith(slice3)
-      );
-    }
-  },
   beforeUnmount() {
-    document.removeEventListener('click', this.handleClickOutside);
-    if (this._onKeydown) window.removeEventListener('keydown', this._onKeydown);
+    document.removeEventListener("click", this.handleClickOutside);
+    window.removeEventListener("keydown", this._onKeydown);
   },
 };
 </script>
