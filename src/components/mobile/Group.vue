@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h3 class="text-xl font-semibold text-gray-900 mb-4">Mis grupos</h3>
+    <h3 class="font-['Outfit'] font-medium text-xl text-gray-900 mb-4">Mis grupos</h3>
 
     <div v-if="loading" class="flex items-center justify-center py-20">
       <Loader />
@@ -10,14 +10,14 @@
       Todavía no creaste grupos.
     </div>
 
-    <div v-else class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
       <div
         v-for="group in filteredGroups"
         :key="group.id || group.group_id"
         class="bg-white rounded-2xl shadow p-5 flex flex-col gap-3 border border-gray-100 relative"
       >
         <div class="flex justify-between items-start">
-          <h4 class="text-lg font-semibold text-gray-900">
+          <h4 class="font-['Outfit'] font-medium text-lg text-gray-900">
             {{ group.name }}
           </h4>
 
@@ -96,10 +96,10 @@
     </div>
 
     <DeleteModal
-      v-model="showDeleteModal"
+      v-if="showDeleteModal"
       :loading="Boolean(actionLoading[deleteTargetId])"
+      @close="closeDeleteModal"
       @confirm="confirmDelete"
-      @cancel="closeDeleteModal"
     >
       ¿Estás seguro de que querés eliminar el grupo
       <span class="font-medium text-gray-800">
@@ -117,193 +117,231 @@
     />
   </div>
 </template>
-
-<script>
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import Loader from "../Loader.vue";
 import DeleteModal from "../DeleteModal.vue";
 import EditGroupModal from "../EditGroupModal.vue";
+import { fetchGroups, deleteGroup as deleteGroupService, archiveGroup as archiveGroupService } from "../../services/groups.js";
 
-import {
-  fetchGroups,
-  deleteGroup as deleteGroupService,
-  archiveGroup as archiveGroupService,
-} from "../../services/groups.js";
-
-export default {
-  components: {
-    Loader,
-    DeleteModal,
-    EditGroupModal,
+const props = defineProps({
+  search: {
+    type: String,
+    default: "",
   },
+});
 
-  props: {
-    search: { type: String, default: "" },
-  },
+const groups = ref([]);
+const openMenuId = ref(null);
+const showEditModal = ref(false);
+const editGroupId = ref(null);
+const showDeleteModal = ref(false);
+const deleteTarget = ref(null);
+const deleteTargetId = ref(null);
+const actionLoading = ref({});
+const loading = ref(true);
+const menuWrapper = ref(null);
 
-  data() {
-    return {
-      groups: [],
-      openMenuId: null,
+const filteredGroups = computed(() => {
+  const q = (props.search || "").toLowerCase().trim();
 
-      showEditModal: false,
-      editGroupId: null,
+  if (q.length < 2) {
+    return groups.value;
+  }
 
-      showDeleteModal: false,
-      deleteTarget: null,
-      deleteTargetId: null,
+  const slice = q.slice(0, 2);
 
-      actionLoading: {},
-      loading: true,
-    };
-  },
+  return groups.value.filter((g) =>
+    (g.name || "").toLowerCase().startsWith(slice)
+  );
+});
 
-  computed: {
-    filteredGroups() {
-      const q = (this.search || "").toLowerCase().trim();
-      if (q.length < 2) return this.groups;
-      const slice = q.slice(0, 2);
-      return this.groups.filter((g) =>
-        (g.name || "").toLowerCase().startsWith(slice)
-      );
-    },
-  },
+async function loadGroups() {
+  loading.value = true;
 
-  methods: {
-    async loadGroups() {
-      this.loading = true;
-      try {
-        const loaded = await fetchGroups();
-        this.groups = Array.isArray(loaded) ? loaded : [];
-      } catch (err) {
-        console.error("Error cargando grupos:", err);
-        this.groups = [];
-      } finally {
-        this.loading = false;
-      }
-    },
+  try {
+    const loaded = await fetchGroups();
 
-    toggleMenu(id) {
-      this.openMenuId = this.openMenuId === id ? null : id;
-    },
+    groups.value = Array.isArray(loaded)
+      ? loaded
+      : [];
+  } catch (err) {
+    console.error("Error cargando grupos:", err);
+    groups.value = [];
+  } finally {
+    loading.value = false;
+  }
+}
 
-    closeMenu() {
-      this.openMenuId = null;
-    },
+function toggleMenu(id) {
+  openMenuId.value =
+    openMenuId.value === id
+      ? null
+      : id;
+}
 
-    handleClickOutside(event) {
-      const wrapper = this.$refs.menuWrapper;
-      if (!wrapper) return;
+function closeMenu() {
+  openMenuId.value = null;
+}
 
-      if (!Array.isArray(wrapper)) {
-        if (!wrapper.contains(event.target)) this.closeMenu();
-      } else {
-        const clickedInside = wrapper.some(
-          (el) => el && el.contains(event.target)
-        );
-        if (!clickedInside) this.closeMenu();
-      }
-    },
+function handleClickOutside(event) {
+  const wrapper = menuWrapper.value;
 
-    formatDate(value) {
-      try {
-        return value ? new Date(value).toLocaleDateString() : "-";
-      } catch {
-        return String(value);
-      }
-    },
+  if (!wrapper) return;
 
-    editGroup(group) {
-      const id = group.id || group.group_id;
-      if (!id) return;
+  if (Array.isArray(wrapper)) {
+    const clickedInside = wrapper.some(
+      (el) => el && el.contains(event.target)
+    );
 
-      this.editGroupId = id;
-      this.showEditModal = true;
-      this.closeMenu();
-    },
+    if (!clickedInside) {
+      closeMenu();
+    }
+  } else {
+    if (!wrapper.contains(event.target)) {
+      closeMenu();
+    }
+  }
+}
 
-    async archiveGroup(group) {
-      const id = group.id || group.group_id;
-      try {
-        await archiveGroupService(id);
-        this.groups = this.groups.filter(
-          (g) => (g.id || g.group_id) !== id
-        );
-      } catch (err) {
-        console.error("Error archivando grupo:", err);
-      } finally {
-        this.closeMenu();
-      }
-    },
+function formatDate(value) {
+  try {
+    return value
+      ? new Date(value).toLocaleDateString()
+      : "-";
+  } catch {
+    return String(value);
+  }
+}
 
-    openDeleteModal(group) {
-      this.deleteTarget = group;
-      this.deleteTargetId = group.id || group.group_id;
-      this.showDeleteModal = true;
-      this.closeMenu();
-    },
+function editGroup(group) {
+  const id = group.id || group.group_id;
 
-    closeDeleteModal() {
-      if (this.actionLoading[this.deleteTargetId]) return;
-      this.showDeleteModal = false;
-      this.deleteTarget = null;
-      this.deleteTargetId = null;
-    },
+  if (!id) return;
 
-    async confirmDelete() {
-      const id = this.deleteTargetId;
-      if (!id || this.actionLoading[id]) return;
+  editGroupId.value = id;
+  showEditModal.value = true;
 
-      const target = this.deleteTarget;
-      this.closeDeleteModal();
+  closeMenu();
+}
 
-      this.$set
-        ? this.$set(this.actionLoading, id, true)
-        : (this.actionLoading[id] = true);
+async function archiveGroup(group) {
+  const id = group.id || group.group_id;
 
-      try {
-        await deleteGroupService(target.id || target.group_id);
-        this.groups = this.groups.filter(
-          (g) => (g.id || g.group_id) !== id
-        );
-      } catch (err) {
-        console.error("Error eliminando grupo:", err);
-      } finally {
-        this.$set
-          ? this.$set(this.actionLoading, id, false)
-          : (this.actionLoading[id] = false);
-      }
-    },
+  try {
+    await archiveGroupService(id);
 
-    closeEditModal() {
-      this.showEditModal = false;
-      this.editGroupId = null;
-    },
+    groups.value = groups.value.filter(
+      (g) => (g.id || g.group_id) !== id
+    );
+  } catch (err) {
+    console.error("Error archivando grupo:", err);
+  } finally {
+    closeMenu();
+  }
+}
 
-    async onGroupUpdated() {
-      await this.loadGroups();
-      this.closeEditModal();
-    },
-  },
+function openDeleteModal(group) {
+  deleteTarget.value = group;
 
-  async mounted() {
-    await this.loadGroups();
+  deleteTargetId.value =
+    group.id || group.group_id;
 
-    document.addEventListener("click", this.handleClickOutside);
+  showDeleteModal.value = true;
 
-    this._onKeydown = (e) => {
-      if (e.key === "Escape") {
-        if (this.showDeleteModal) this.closeDeleteModal();
-        else if (this.showEditModal) this.closeEditModal();
-        else this.closeMenu();
-      }
-    };
+  closeMenu();
+}
 
-    window.addEventListener("keydown", this._onKeydown);
-  },
+function closeDeleteModal() {
+  if (
+    actionLoading.value[
+      deleteTargetId.value
+    ]
+  ) {
+    return;
+  }
 
-  beforeUnmount() {
-    document.removeEventListener("click", this.handleClickOutside);
-    window.removeEventListener("keydown", this._onKeydown);
-  },
-};
+  showDeleteModal.value = false;
+  deleteTarget.value = null;
+  deleteTargetId.value = null;
+}
+
+async function confirmDelete() {
+  const id = deleteTargetId.value;
+
+  if (
+    !id ||
+    actionLoading.value[id]
+  ) {
+    return;
+  }
+
+  const target = deleteTarget.value;
+
+  closeDeleteModal();
+
+  actionLoading.value[id] = true;
+
+  try {
+    await deleteGroupService(
+      target.id || target.group_id
+    );
+
+    groups.value = groups.value.filter(
+      (g) => (g.id || g.group_id) !== id
+    );
+  } catch (err) {
+    console.error("Error eliminando grupo:", err);
+  } finally {
+    actionLoading.value[id] = false;
+  }
+}
+
+function closeEditModal() {
+  showEditModal.value = false;
+  editGroupId.value = null;
+}
+
+async function onGroupUpdated() {
+  await loadGroups();
+  closeEditModal();
+}
+
+function handleKeydown(e) {
+  if (e.key === "Escape") {
+    if (showDeleteModal.value) {
+      closeDeleteModal();
+    } else if (showEditModal.value) {
+      closeEditModal();
+    } else {
+      closeMenu();
+    }
+  }
+}
+
+onMounted(async () => {
+  await loadGroups();
+
+  document.addEventListener(
+    "click",
+    handleClickOutside
+  );
+
+  window.addEventListener(
+    "keydown",
+    handleKeydown
+  );
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener(
+    "click",
+    handleClickOutside
+  );
+
+  window.removeEventListener(
+    "keydown",
+    handleKeydown
+  );
+});
 </script>

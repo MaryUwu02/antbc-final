@@ -5,7 +5,7 @@
         <i class="fa-solid fa-chevron-left"></i>
       </button>
 
-      <h3 class="font-semibold text-gray-900 text-lg">
+      <h3 class="font-['Outfit'] font-medium text-gray-900 text-lg">
         {{ monthName }} {{ currentYear }}
       </h3>
 

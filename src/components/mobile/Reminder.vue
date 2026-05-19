@@ -1,9 +1,10 @@
 <template>
   <div>
-    <h3 class="text-xl font-semibold text-gray-900 mb-4">Recordatorios</h3>
+    <h3 class="font-['Outfit'] font-medium text-xl text-gray-900 mb-4">Recordatorios</h3>
+
     <p 
       v-if="reminders.length === 0" 
-      class="text-gray-500 text-sm italic"
+      class="text-gray-500 font-body text-sm italic"
     >
       Todavía no creaste ningún recordatorio
     </p>
@@ -16,12 +17,15 @@
       >
         <div class="flex-1 flex flex-col gap-2">
           <div class="flex items-start justify-between">
-            <h4 class="font-semibold text-gray-800">{{ item.title }}</h4>
+            <h4 class="font-['Outfit'] font-medium text-gray-800">{{ item.title }}</h4>
             <div class="flex items-center gap-3 text-gray-500">
-              <i class="fa-solid fa-pen-to-square cursor-pointer hover:text-gray-800 transition text-lg"></i>
+              <i
+                class="fa-solid fa-pen-to-square cursor-pointer hover:text-gray-800 transition text-lg"
+                @click="openEdit(item)" >
+              </i>
               <i 
                 class="fa-solid fa-xmark cursor-pointer hover:text-gray-800 transition text-lg"
-                @click="onDelete(item.id)"
+                @click="openDeleteReminder(item)"
               ></i>
             </div>
           </div>
@@ -38,24 +42,44 @@
     </div>
 
     <div class="mt-6 flex gap-3">
-      <button
-        @click="openModal"
-        class="btn-primary px-6 py-2 rounded-xl text-white font-semibold hover:bg-green-800 transition"
-      >
-        Nuevo recordatorio
-      </button>
-      <router-link to="/allreminders"
-        class="btn-outline-primary px-6 py-2 rounded-xl bg-gray-100 text-gray-800 font-semibold transition"
-      >
-        Ver todo
-      </router-link>
+        <button
+          @click="openModal"
+          class="btn-primary px-6 py-2 rounded-xl text-white font-semibold hover:bg-green-800 transition"
+        >
+          Nuevo recordatorio
+        </button>
+  
+        <router-link to="/allreminders"
+          class="btn-outline-primary px-6 py-2 rounded-xl bg-gray-100 text-gray-800 font-semibold transition"
+        >
+          Ver todo
+        </router-link>
     </div>
+    
+      <ReminderModal
+        v-if="showModal"
+        @close="showModal = false"
+        @created="addReminder"
+      />
 
-    <ReminderModal 
-      v-if="showModal" 
-      @close="showModal = false"
-      @created="addReminder"
-    />
+      <EditReminderModal
+        v-if="showEditModal"
+        :reminder="selectedReminder"
+        @close="showEditModal = false"
+        @updated="handleUpdatedReminder"
+      />
+
+      <DeleteModal
+        v-if="showDeleteReminderModal"
+        title="Eliminar recordatorio"
+        @close="showDeleteReminderModal = false"
+        @confirm="confirmDeleteReminder"
+      >
+      <span>
+        ¿Estás seguro de que querés eliminar este recordatorio?
+      </span>
+      </DeleteModal>
+
   </div>
 </template>
 
@@ -64,6 +88,8 @@ import { ref, onMounted, computed } from "vue"
 import { supabase } from "../../services/supabase"
 import { getReminders, deleteReminder } from "../../services/reminder.js"
 import ReminderModal from "../../components/ReminderModal.vue"
+import EditReminderModal from "../EditReminderModal.vue"
+import DeleteModal from "../DeleteModal.vue"
 
 const props = defineProps({
   limit: {
@@ -74,6 +100,10 @@ const props = defineProps({
 
 const reminders = ref([])
 const showModal = ref(false)
+const showEditModal = ref(false);
+const selectedReminder = ref(null);
+const showDeleteReminderModal = ref(false);
+const reminderToDelete = ref(null);
 
 function openModal() {
   showModal.value = true
@@ -108,6 +138,47 @@ async function onDelete(id) {
     console.error("Error eliminando recordatorio:", err)
     alert("No se pudo eliminar el recordatorio")
   }
+}
+
+function openEdit(reminder) {
+  selectedReminder.value = reminder;
+  showEditModal.value = true;
+}
+
+function handleUpdatedReminder(updatedReminder) {
+
+  reminders.value = reminders.value.map(reminder => {
+
+    if (reminder.id === updatedReminder.id) {
+      return updatedReminder;
+    }
+
+    return reminder;
+  });
+}
+
+function openDeleteReminder(reminder) {
+  reminderToDelete.value = reminder;
+  showDeleteReminderModal.value = true;
+}
+async function confirmDeleteReminder() {
+
+  try {
+
+    await deleteReminder(reminderToDelete.value.id);
+
+    reminders.value = reminders.value.filter(
+      reminder => reminder.id !== reminderToDelete.value.id
+    );
+
+    showDeleteReminderModal.value = false;
+
+  } catch(error) {
+
+    console.error(error);
+
+  }
+
 }
 
 onMounted(() => {

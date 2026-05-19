@@ -20,19 +20,52 @@ async function fetchCurrentAuthUserData() {
     notifyAll()
 }
 
-export async function register(email, password) {
-    const { data, error } = await supabase.auth.signUp({ email, password })
-    if(error) throw new Error(error.message)
+export async function register(email, password, username) {
+    const { data, error } = await supabase.auth.signUp({
+    email,
+    password
+});
 
-    user = {
-        id: data.user.id,
-        email: data.user.email
-    }
-    notifyAll()
+if (error) throw new Error(error.message);
+
+const authUser = data.user;
+
+const { error: profileError } = await supabase
+    .from("profiles")
+    .insert({
+        id: authUser.id,
+        username,
+        avatar_url: null
+    });
+
+if (profileError) {
+    throw new Error(profileError.message);
+}
+
+user = {
+    id: authUser.id,
+    email: authUser.email
+};
+
+notifyAll();
+    // const { data, error } = await supabase.auth.signUp({
+    //     email,
+    //     password
+    // });
+    // if(error) throw new Error(error.message)
+
+    // user = {
+    //     id: data.user.id,
+    //     email: data.user.email
+    // }
+    // notifyAll()
 }
 
 export async function login(email, password) {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+    });
     if(error) throw new Error(error.message)
 
     user = {

@@ -16,6 +16,8 @@ const routes = [
   { path: '/trash', component: () => import('../pages/appweb/Trash.vue') },
   { path: '/archived', component: () => import('../pages/appweb/Archived.vue') },
   { path: '/group/:id', component: () => import('../pages/appweb/MyGroup.vue'), props: true },
+  { path: '/followupmembers', component: () => import('../pages/appweb/FollowUpMembers.vue') },
+
 
   //{ path: '/group/:groupId/files', name: 'CardFile', component: CardFile, props: true },
   //{ path: '/group/:groupId/files/new', name: 'NewFile', component: NewFile, props: true },

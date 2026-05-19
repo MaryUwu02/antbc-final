@@ -3,7 +3,7 @@
     <NavMobile />
 
     <main class="flex-1 p-6">
-      <h1 class="text-2xl font-bold text-gray-800 mb-2">Papelera</h1>
+      <h1 class="font-['Outfit'] font-bold text-3xl mb-2">Papelera</h1>
       <p class="text-gray-600 mb-6">
         Los grupos eliminados se pueden restaurar o eliminar permanentemente.
       </p>

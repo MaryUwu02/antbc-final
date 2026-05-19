@@ -3,7 +3,7 @@
     <NavMobile />
 
     <main class="flex-1 p-6">
-      <h1 class="text-2xl font-bold text-gray-800 mb-2">Archivado</h1>
+      <h1 class="font-['Outfit'] font-bold text-3xl mb-2">Archivado</h1>
       <p class="text-gray-600 mb-6">
         Acá podés ver todos los proyectos que archivaste. Podés desarchivar o eliminar proyectos según necesites.
       </p>
