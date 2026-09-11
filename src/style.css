@@ -1,0 +1,90 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Outfit:wght@100..900&display=swap');
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+body {
+    font-family: 'Nunito', sans-serif;
+    background-color: #f3f4f6;
+    color: #111827;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-item .nav-bg {
+  position: absolute;
+  inset: 0;
+  background-color: #e0f2fe; /* Celeste claro para modo claro (sky-100) */
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: inherit;
+  z-index: 0;
+}
+
+.dark .nav-item .nav-bg {
+  background-color: rgba(56, 189, 248, 0.2); /* Celeste suave para modo oscuro */
+}
+
+.dark body {
+    background-color: #111827;
+    color: #f9fafb;
+}
+
+.menu-link:hover {
+    color: #E3562B;
+}
+.btn-primary {
+    background-color: #E3562B;
+    color: white;
+}
+.btn-primary:hover {
+    background-color: #d44f27;
+}
+.btn-outline-primary:hover {
+    background-color: #FFE6DC;
+}
+.btn-outline-primary {
+    background-color: white;
+    border: 2px solid #E3562B; 
+}
+.featuresOne{
+    background-image: url('../src/assets/imgs/feature-one.jpg');
+    background-size: cover;
+    background-position: center;
+}
+.featuresTwo{
+    background-image: url('../src/assets/imgs/feature-two.jpg');
+    background-size: cover;
+    background-position: center;
+}
+.featuresThree{
+    background-image: url('../src/assets/imgs/feature-three.jpg');
+    background-size: cover;
+    background-position: center;
+}
+.text-color{
+    color: #E3562B;
+}
+.img-fondo{
+    background-image: url('../src/assets/imgs/fondo-form.jpg');
+    background-size: cover;
+}
+.login-img{
+    background-image: url('../src/assets/imgs/login.jpg');
+}
+.img-register{
+    background-image: url('../src/assets/imgs/register.jpg');
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(-50%);
+    }
+    100% {
+        transform: translateX(0%);
+    }
+}
+.animate-marquee {
+    display: inline-flex;
+    animation: marquee 15s linear infinite;
+}
