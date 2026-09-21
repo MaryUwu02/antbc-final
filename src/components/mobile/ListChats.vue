@@ -1,76 +1,100 @@
-
 <template>
-  <div class="flex h-screen">
-
-    <div class="w-80 border-r p-4">
-
-      <Search v-model="search" />
-
-      <ul class="space-y-2 mt-4">
-        <li
-          v-for="chat in filteredChats"
-          :key="chat.id"
+    <div class="flex-1 min-h-0 flex flex-col">
+        <Search v-model="search" />
+        <div
+            v-if="filteredChats.length === 0"
+            class="flex-1 flex items-center justify-center"
         >
-          <router-link
-            :to="`/group/${chat.id}`"
-            class="flex items-center gap-3 p-3 hover:bg-gray-100 transition"
-          >
-            <div class="w-10 h-10 rounded-full bg-[#140E0C] text-white flex items-center justify-center font-semibold">
-              {{ chat.name.charAt(0).toUpperCase() }}
-            </div>
+            <p class="text-sm text-gray-400">
+                No hay chats disponibles.
+            </p>
+        </div>
 
-            <div class="flex flex-col">
-              <span class="font-semibold text-[#332926]">
-                {{ chat.name }}
-              </span>
+        <ul
+            v-else
+            class="flex-1 min-h-0 mt-5 overflow-y-auto space-y-2 pr-1"
+        >
+            <li
+                v-for="chat in filteredChats"
+                :key="chat.id"
+            >
+                <button
+                    type="button"
+                    @click="$emit('select-chat', chat)"
+                    class="w-full flex items-center gap-3 p-3 rounded-xl text-left transition"
+                    :class="selectedChat?.id === chat.id
+                        ? 'bg-[#F7F7F7]'
+                        : 'hover:bg-[#F7F7F7]'"
+                >
+                    <div
+                        class="w-11 h-11 rounded-full bg-[#140E0C] text-white flex items-center justify-center font-semibold shrink-0"
+                    >
+                        {{ chat.name?.charAt(0).toUpperCase() }}
+                    </div>
 
-              <span class="text-sm text-gray-500">
-                Mensaje...
-              </span>
-            </div>
-          </router-link>
-        </li>
-      </ul>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center justify-between gap-2">
+                            <span
+                                class="font-semibold text-[#332926] truncate"
+                            >
+                                {{ chat.name }}
+                            </span>
+
+                            <span
+                                v-if="chat.last_message_at"
+                                class="text-xs text-gray-400 shrink-0"
+                            >
+                                {{
+                                    new Date(chat.last_message_at).toLocaleTimeString(
+                                        'es-AR',
+                                        {
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            hour12: false
+                                        }
+                                    )
+                                }}
+                            </span>
+                        </div>
+                        <span
+                            class="block text-sm text-gray-500 truncate mt-0.5"
+                        >
+                            {{ chat.last_message || 'Todavía no hay mensajes' }}
+                        </span>
+                    </div>
+                </button>
+            </li>
+        </ul>
     </div>
-
-    <div class="flex-1 flex flex-col">
-      <div class="border-b p-4 font-semibold">
-        nombre del chat
-      </div>
-
-      <div class="flex-1 p-4 overflow-y-auto">
-        aca van los chats funcionales
-      </div>
-    </div>
-
-  </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { fetchOwnedGroups } from '../../services/groups'
-import Search from '../../components/mobile/Search.vue';
+import { ref, computed } from 'vue'
+import Search from '../../components/mobile/Search.vue'
 
-const search = ref('')
-const chats = ref([])
-const loading = ref(true)
-
-const filteredChats = computed(() => {
-  if (!search.value) return chats.value
-
-  return chats.value.filter(chat =>
-    chat.name
-      .toLowerCase()
-      .includes(search.value.toLowerCase())
-  )
+const props = defineProps({
+    chats: {
+        type: Array,
+        default: () => []
+    },
+    selectedChat: {
+        type: Object,
+        default: null
+    }
 })
 
-async function loadChats() {
-  loading.value = true
-  chats.value = await fetchOwnedGroups()
-  loading.value = false
-}
+defineEmits(['select-chat'])
+const search = ref('')
 
-onMounted(loadChats)
+const filteredChats = computed(() => {
+    if (!search.value.trim()) {
+        return props.chats
+    }
 
+    return props.chats.filter(chat =>
+        chat.name
+            ?.toLowerCase()
+            .includes(search.value.toLowerCase())
+    )
+})
 </script>
