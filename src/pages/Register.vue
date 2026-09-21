@@ -166,7 +166,7 @@ async function handleSubmit() {
     await register(
       user.value.email,
       user.value.password,
-      { full_name: user.value.nombre }
+      user.value.nombre
     );
 
     router.push("/home");
