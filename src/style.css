@@ -75,6 +75,21 @@ body {
 .img-register{
     background-image: url('../src/assets/imgs/register.jpg');
 }
+.chatScroll::-webkit-scrollbar{
+    width: 5px;
+}
+.chatScroll::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chatScroll::-webkit-scrollbar-thumb {
+    background: #d6c7a8;
+    border-radius: 10px;
+}
+
+.chatScroll::-webkit-scrollbar-button {
+    display: none;
+}
 
 @keyframes marquee {
     0% {

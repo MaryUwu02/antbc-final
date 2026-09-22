@@ -90,7 +90,7 @@ export async function fetchGroups() {
       `)
       .in('group_id', groupIds)
       .is('deleted_at', null)
-        .is('archived_at', null);
+      .is('archived_at', null);
 
     if (joinedError) throw joinedError;
 
@@ -105,13 +105,46 @@ export async function fetchGroups() {
 
   const allGroups = Array.from(map.values());
 
-  return allGroups.map(g => ({
-    ...g,
-    id: g.group_id,
-    members_count: g.group_members?.[0]?.count || 0,
-    progress: g.progress || 0,
-    updated_at: g.updated_at || g.created_at,
-  }));
+  const allGroupIds = allGroups.map(g => g.group_id);
+
+  let lastMessages = [];
+
+  if (allGroupIds.length > 0) {
+    const { data: messages, error: messagesError } = await supabase
+      .from('messages')
+      .select('group_id, text, created_at')
+      .in('group_id', allGroupIds)
+      .order('created_at', { ascending: false });
+
+    if (messagesError) throw messagesError;
+
+    const latestByGroup = new Map();
+
+    messages.forEach(message => {
+      if (!latestByGroup.has(message.group_id)) {
+        latestByGroup.set(message.group_id, message);
+      }
+    });
+
+    lastMessages = latestByGroup;
+  }
+
+  return allGroups.map(g => {
+
+    const lastMessage = lastMessages.get(g.group_id);
+
+    return {
+      ...g,
+      id: g.group_id,
+      members_count: g.group_members?.[0]?.count || 0,
+      progress: g.progress || 0,
+      updated_at: g.updated_at || g.created_at,
+
+      last_message: lastMessage?.text || null,
+      last_message_at: lastMessage?.created_at || null
+    };
+
+  });
 }
 
 export async function fetchGroupById(groupId) {
