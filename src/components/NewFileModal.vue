@@ -3,14 +3,14 @@
 
         <div class="relative bg-white rounded-2xl shadow p-6 w-full max-w-md z-10">
 
-            <h2 class="font-['Outfit'] font-medium text-xl text-gray-900 mb-4"">
+            <h2 class="font-['Outfit'] font-medium text-xl text-gray-900 mb-4">
                 Crear nuevo archivo
             </h2>
 
             <form @submit.prevent="onSubmit" class="space-y-4">
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
                         Nombre
                     </label>
                     <input
@@ -26,7 +26,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">
+                    <label class="block text-sm font-medium text-gray-700 ">
                         Etiquetas
                     </label>
 

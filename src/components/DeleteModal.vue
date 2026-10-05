@@ -9,7 +9,7 @@
 
             <p class="text-sm text-gray-600 mb-6">
                 <slot>
-                ¿Estás seguro de que querés eliminar este grupo?
+                ¿Estás seguro de que querés eliminar esto?
                 </slot>
             </p>
 
@@ -31,11 +31,8 @@
                 <span v-if="!loading">Eliminar</span>
                 <span v-else>Eliminando…</span>
                 </button>
-
             </div>
-
         </div>
-
     </BaseModal>
 </template>
 

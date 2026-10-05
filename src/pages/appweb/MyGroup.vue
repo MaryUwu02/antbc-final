@@ -22,21 +22,29 @@
 
       <div class="flex flex-col items-end mb-6 gap-4">
         <ButtonsGroup
+          v-if="group"
+          :group-id="group.group_id"
           @invite="showInviteModal = true"
           @new-file="showCreateFileModal = true"
           @leave="handleLeaveGroup"
         />
-
-        <div class="w-full md:w-auto">
-          <ListOptionsGroup />
-        </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         <CardFile
-          v-for="(file, index) in files"
-          :key="index"
+          :file="null"
+          @create="createFile"
+        />
+
+        <CardFile
+          v-for="file in files"
+          :key="file.id"
           :file="file"
+          @edit="editFile"
+          @archive="archiveFile"
+          @duplicate="duplicateFile"
+          @delete="deleteFile"
+          @favorite="toggleFavorite"
         />
       </div>
     </main>
@@ -51,7 +59,6 @@ import NavMobile from '../../components/mobile/NavMobile.vue';
 import WelcomeGroup from '../../components/mobile/WelcomeGroup.vue';
 import Search from '../../components/mobile/Search.vue';
 import ButtonsGroup from '../../components/mobile/ButtonsGroup.vue';
-import ListOptionsGroup from '../../components/mobile/ListOptionsGroup.vue';
 import CardFile from '../../components/mobile/CardFile.vue';
 import CodeModal from "../../components/CodeModal.vue";
 import NewFileModal from "../../components/NewFileModal.vue";
@@ -59,13 +66,16 @@ import NewFileModal from "../../components/NewFileModal.vue";
 const router = useRouter();
 const route = useRoute();
 const group = ref(null);
-const files = ref([])
-
+const files = ref([]);
 const showInviteModal = ref(false);
 const showCreateFileModal = ref(false);
 
+function createFile() {
+  showCreateFileModal.value = true;
+}
+
 function addFile(newFile) {
-  files.value.unshift(newFile)
+  files.value.unshift(newFile);
 }
 
 async function handleLeaveGroup() {

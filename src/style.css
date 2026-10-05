@@ -11,18 +11,18 @@ body {
 }
 
 .nav-item .nav-bg {
-  position: absolute;
-  inset: 0;
-  background-color: #e0f2fe; /* Celeste claro para modo claro (sky-100) */
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: inherit;
-  z-index: 0;
+    position: absolute;
+    inset: 0;
+    background-color: #e0f2fe; /* Celeste claro para modo claro (sky-100) */
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: inherit;
+    z-index: 0;
 }
 
 .dark .nav-item .nav-bg {
-  background-color: rgba(56, 189, 248, 0.2); /* Celeste suave para modo oscuro */
+    background-color: rgba(56, 189, 248, 0.2); /* Celeste suave para modo oscuro */
 }
 
 .dark body {
@@ -83,7 +83,7 @@ body {
 }
 
 .chatScroll::-webkit-scrollbar-thumb {
-    background: #d6c7a8;
+    background: #e6dac3;
     border-radius: 10px;
 }
 

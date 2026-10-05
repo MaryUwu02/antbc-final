@@ -7,12 +7,12 @@
       <template v-if="!selectedGroupId && !selectedMemberId && !showSeguimiento">
 
         <div class="flex flex-col gap-4">
-
           <div class="flex items-center justify-between gap-2 w-full">
             <div class="flex-1">
               <Search v-model="search" />
             </div>
-            <CreateGroupBtn 
+
+            <CreateGroupBtn
               @create="showCreateGroupModal = true"
               @join="showJoinModal = true"
             />
@@ -22,7 +22,6 @@
             <Welcome v-if="showWelcomeMessage" />
           </transition>
         </div>
-        
         <div class="mt-6">
           <Group
             :key="groupsKey"
@@ -32,13 +31,37 @@
         </div>
 
         <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Reminder/>
+
+          <div>
+            <Reminder
+              :reminders="reminders"
+              @updated="handleUpdatedReminder"
+              @deleted="handleDeletedReminder"
+            />
+
+            <div class="mt-6 flex gap-3">
+              <button
+                @click="openReminderModal()"
+                class="btn-primary px-6 py-2 rounded-xl text-white font-semibold hover:bg-green-800 transition"
+              >
+                Nuevo recordatorio
+              </button>
+
+              <router-link
+                to="/allreminders"
+                class="btn-outline-primary px-6 py-2 rounded-xl bg-gray-100 text-gray-800 font-semibold transition"
+              >
+                Ver todo
+              </router-link>
+            </div>
+          </div>
+
           <CalendarWidget
             :reminders="reminders"
             @select-date="openReminderModal"
           />
         </div>
-        
+
       </template>
 
       <template v-else-if="selectedGroupId && !showSeguimiento && !selectedMemberId">
@@ -50,7 +73,9 @@
       </template>
 
       <template v-else-if="showSeguimiento && !selectedMemberId">
-        <Seguimiento @view-member="showMemberDetail" />
+        <Seguimiento
+          @view-member="showMemberDetail"
+        />
       </template>
 
       <template v-else-if="selectedMemberId">
@@ -80,7 +105,8 @@
         v-if="showReminderModal"
         :key="selectedDate"
         :defaultDate="selectedDate"
-        @close="showReminderModal = false"
+        @close="closeReminderModal"
+        @created="onReminderCreated"
       />
 
     </main>
@@ -89,6 +115,8 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { supabase } from "../../services/supabase";
+import { getReminders } from "../../services/reminder.js";
 import NavMobile from "../../components/mobile/NavMobile.vue";
 import Search from "../../components/mobile/Search.vue";
 import CreateGroupBtn from "../../components/mobile/CreateGroupBtn.vue";
@@ -113,23 +141,23 @@ const reminders = ref([]);
 const showReminderModal = ref(false);
 const selectedDate = ref(null);
 const groupsKey = ref(0);
-
 const showWelcomeMessage = ref(false);
 
-onMounted(() => {
-  const hasSeenWelcome = sessionStorage.getItem('hasSeenWelcome');
-  
-  if (!hasSeenWelcome) {
-    showWelcomeMessage.value = true;
-    sessionStorage.setItem('hasSeenWelcome', 'true');
-    
-    setTimeout(() => {
-      showWelcomeMessage.value = false;
-    }, 4500);
-  }
-});
+async function loadReminders() {
+  try {
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
 
-function openReminderModal(date) {
+    if (!user) return;
+
+    reminders.value = await getReminders(user.id);
+  } catch (error) {
+    console.error("Error cargando recordatorios:", error);
+  }
+}
+
+function openReminderModal(date = null) {
   selectedDate.value = date;
   showReminderModal.value = true;
 }
@@ -140,7 +168,25 @@ function closeReminderModal() {
 }
 
 function onReminderCreated(reminder) {
-  reminders.value.push(reminder);
+  reminders.value.unshift(reminder);
+
+  closeReminderModal();
+}
+
+function handleUpdatedReminder(updatedReminder) {
+  reminders.value = reminders.value.map(reminder => {
+    if (reminder.id === updatedReminder.id) {
+      return updatedReminder;
+    }
+
+    return reminder;
+  });
+}
+
+function handleDeletedReminder(id) {
+  reminders.value = reminders.value.filter(
+    reminder => reminder.id !== id
+  );
 }
 
 function showGroupDetail(group) {
@@ -172,6 +218,22 @@ function refreshGroups() {
 function onGroupCreated() {
   refreshGroups();
 }
+
+onMounted(() => {
+  const hasSeenWelcome = sessionStorage.getItem("hasSeenWelcome");
+
+  if (!hasSeenWelcome) {
+    showWelcomeMessage.value = true;
+
+    sessionStorage.setItem("hasSeenWelcome", "true");
+
+    setTimeout(() => {
+      showWelcomeMessage.value = false;
+    }, 4500);
+  }
+
+  loadReminders();
+});
 </script>
 
 <style scoped>

@@ -9,14 +9,14 @@
             <form @submit.prevent="onCreateGroup" class="space-y-4">
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
                         Nombre del grupo
                     </label>
                     <input
                         v-model="form.name"
                         type="text"
                         class="w-full px-4 py-2 rounded-lg border border-gray-300
-                        focus:outline-none focus:ring-2 focus:ring-blue-300"
+                        focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-400 focus:shadow-md transition-all duration-300 ease-in-out resize-none"
                         :class="{ 'border-red-500': errors.name }"
                     />
                     <p v-if="errors.name" class="text-red-500 text-sm mt-1">
@@ -25,7 +25,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
                         Fecha de inicio
                     </label>
                     <input
@@ -33,19 +33,22 @@
                         :value="today"
                         readonly
                         class="w-full px-4 py-2 rounded-lg border border-gray-300
-                        focus:outline-none focus:ring-2 focus:ring-blue-300"
+                        focus:outline-none focus:ring-2 focus:ring-gray-200 focus:border-gray-400 focus:shadow-md
+                        transition-all duration-300 ease-in-out resize-none"
                     />
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
                         Finalización (opcional)
                     </label>
                     <input
                         type="date"
                         v-model="form.due_date"
                         class="w-full px-4 py-2 rounded-lg border border-gray-300
-                        focus:outline-none focus:ring-2 focus:ring-blue-300"
+                        focus:outline-none focus:ring-2 focus:ring-gray-200
+                        focus:border-gray-400 focus:shadow-md
+                        transition-all duration-300 ease-in-out resize-none"
                         :class="{ 'border-red-500': errors.due_date }"
                     />
                     <p v-if="errors.due_date" class="text-red-500 text-sm mt-1">

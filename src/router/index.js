@@ -17,8 +17,8 @@ const routes = [
   { path: '/archived', component: () => import('../pages/appweb/Archived.vue') },
   { path: '/group/:id', component: () => import('../pages/appweb/MyGroup.vue'), props: true },
   { path: '/followupmembers', component: () => import('../pages/appweb/FollowUpMembers.vue') },
-
-
+  { path: '/pomodorocomponent/:id', component: () => import('../components/PomodoroComponent.vue'), props: true},
+  { path: '/flashcard/:id', component: () => import('../pages/appweb/MyFlashcards.vue'), props: true },
   //{ path: '/group/:groupId/files', name: 'CardFile', component: CardFile, props: true },
   //{ path: '/group/:groupId/files/new', name: 'NewFile', component: NewFile, props: true },
   //{ path: '/group/:groupId/files/:fileId', name: 'FileInside', component: FileInside, props: true },
